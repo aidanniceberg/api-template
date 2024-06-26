@@ -1,0 +1,13 @@
+services:
+  # for local development
+  db:
+    image: postgres
+    container_name: template  # container name goes here
+    environment:
+      POSTGRES_USER: template-user  # username goes here
+      POSTGRES_PASSWORD: template-password  # password goes here
+      POSTGRES_DB: template-dbname  # db name goes here
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./src/migrations:/docker-entrypoint-initdb.d/
