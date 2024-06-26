@@ -46,6 +46,10 @@ class DBController:
         try:
             session = Session(cls.engine)
             yield session
+        except Exception:
+            if session:
+                session.rollback()
+            raise
         finally:
             if session:
                 session.close()

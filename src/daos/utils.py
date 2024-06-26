@@ -12,12 +12,12 @@ def errorhandle(logger: Logger):
                 return func(*args, **kwargs)
             except OperationalError as e:
                 logger.error(f"Connection error in {func.__name__}: {e}")
-                raise e
+                raise
             except Exception as e:
                 logger.error(
                     f"An unexpected exception occurred in {func.__name__}: {e}"
                 )
-                raise e
+                raise
 
         return error_handler
 

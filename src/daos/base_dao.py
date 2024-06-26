@@ -1,13 +1,13 @@
 import logging
-from typing import Any, ClassVar, List, Optional, Type
+from typing import List, Any, Type, ClassVar, Optional
 
-from sqlalchemy import ColumnElement, delete, insert, select, update
+from sqlalchemy import delete, select, update, ColumnElement, insert
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Session
 
+from .utils import errorhandle
 from ..models.base_dto import BaseDTO
 from ..models.base_orm import BaseORM
-from .utils import errorhandle
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ class BaseDAO:
         stmt = insert(cls.__orm_model__).returning(cls.__orm_model__)
         orm_models = [cls.__orm_model__.from_dto(dto) for dto in dtos]
         results = session.scalars(stmt, orm_models)
+        session.commit()
         return [result.to_dto() for result in results]
 
     @classmethod
@@ -113,45 +114,44 @@ class BaseDAO:
 
     @classmethod
     @errorhandle(logger)
-    def delete(cls, session: Session, pkey: Any, orm_model: Type[BaseORM] = None):
+    def delete(cls, session: Session, pkey: Any):
         """
         Delete a record from the database
         :param session: database session
         :param pkey: primary key to search for
-        :param orm_model: model to delete. If None, defaults to cls.__orm_model__
         :return: deleted entity
         """
-        orm_model = orm_model or cls.__orm_model__
-        pkey_cols = inspect(orm_model).primary_key
-        assert pkey_cols, f"{orm_model} does not have any primary keys"
+        pkey_cols = inspect(cls.__orm_model__).primary_key
+        assert pkey_cols, f"{cls.__orm_model__} does not have any primary keys"
         pkey_col = pkey_cols[0]
-        stmt = delete(orm_model).where(pkey_col == pkey).returning(orm_model)
+        stmt = (
+            delete(cls.__orm_model__)
+            .where(pkey_col == pkey)
+            .returning(cls.__orm_model__)
+        )
         result = session.scalars(stmt).one()
-        result_dto = result.to_dto()
-        return result_dto
+        session.commit()
+        return result.to_dto()
 
     @classmethod
     @errorhandle(logger)
-    def update(
-        cls, session: Session, pkey: Any, orm_model: Type[BaseORM] = None, **kwargs
-    ):
+    def update(cls, session: Session, pkey: Any, **kwargs):
         """
         Updates a record from the database
         :param session: database session
         :param pkey: primary key to search for
-        :param orm_model: model to delete. If None, defaults to cls.__orm_model__
         :param kwargs: args to update
         :return: deleted entity
         """
-        orm_model = orm_model or cls.__orm_model__
-        pkey_cols = inspect(orm_model).primary_key
-        assert pkey_cols, f"{orm_model} does not have any primary keys"
+        pkey_cols = inspect(cls.__orm_model__).primary_key
+        assert pkey_cols, f"{cls.__orm_model__} does not have any primary keys"
         pkey_col = pkey_cols[0]
         stmt = (
-            update(orm_model)
+            update(cls.__orm_model__)
             .where(pkey_col == pkey)
             .values(kwargs)
-            .returning(orm_model)
+            .returning(cls.__orm_model__)
         )
         result = session.scalars(stmt).one()
+        session.commit()
         return result.to_dto()
