@@ -26,7 +26,7 @@ class BaseDAO:
         """
         orm = cls.__orm_model__.from_dto(dto)
         session.add(orm)
-        session.commit()
+        session.flush()
         return orm.to_dto()
 
     @classmethod
@@ -41,7 +41,7 @@ class BaseDAO:
         stmt = insert(cls.__orm_model__).returning(cls.__orm_model__)
         orm_models = [cls.__orm_model__.from_dto(dto) for dto in dtos]
         results = session.scalars(stmt, orm_models)
-        session.commit()
+        session.flush()
         return [result.to_dto() for result in results]
 
     @classmethod
@@ -130,7 +130,6 @@ class BaseDAO:
             .returning(cls.__orm_model__)
         )
         result = session.scalars(stmt).one()
-        session.commit()
         return result.to_dto()
 
     @classmethod
@@ -153,5 +152,4 @@ class BaseDAO:
             .returning(cls.__orm_model__)
         )
         result = session.scalars(stmt).one()
-        session.commit()
         return result.to_dto()
