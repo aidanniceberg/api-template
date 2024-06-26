@@ -1,13 +1,13 @@
 import logging
-from typing import List, Any, Type, ClassVar, Optional
+from typing import Any, ClassVar, List, Optional, Type
 
-from sqlalchemy import delete, select, update, ColumnElement, insert
+from sqlalchemy import ColumnElement, delete, insert, select, update
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Session
 
-from .utils import errorhandle
 from ..models.base_dto import BaseDTO
 from ..models.base_orm import BaseORM
+from .utils import errorhandle
 
 logger = logging.getLogger(__name__)
 
