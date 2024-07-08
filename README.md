@@ -1,6 +1,23 @@
 # API Template
 This is a template to follow when creating APIs
 
+## Running Locally
+### Docker (quick)
+1. Navigate to root directory
+2. Run with `docker-compose up -d`
+### Virtual Environment (better debugging)
+_Assumes you're using PyCharm_
+1. Navigate to root directory
+2. Start database in docker with `docker-compose run -d --service-ports db`
+3. Start redis in docker with `docker-compose run -d --service-ports redis`
+4. Create a new virtual environment at `.venv`
+5. Navigate to root directory
+6. Activate virtual environment with `source .venv/bin/activate`
+7. Install requirements with `pip install -r requirements.txt`
+8. Create new Python run configuration
+   1. `script` -> `[root]/src/app.py`
+9. Run
+
 ## Folder Structure
 ```
 src

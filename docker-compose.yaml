@@ -11,3 +11,11 @@ services:
       - "5432:5432"
     volumes:
       - ./src/migrations:/docker-entrypoint-initdb.d/
+  service:
+    build: .
+    container_name: service
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432

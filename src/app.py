@@ -23,4 +23,4 @@ logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 app = FlaskApp(__name__)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
