@@ -9,14 +9,16 @@ This is a template to follow when creating APIs
 _Assumes you're using PyCharm_
 1. Navigate to root directory
 2. Start database in docker with `docker-compose run -d --service-ports db`
-3. Start redis in docker with `docker-compose run -d --service-ports redis`
-4. Create a new virtual environment at `.venv`
-5. Navigate to root directory
-6. Activate virtual environment with `source .venv/bin/activate`
-7. Install requirements with `pip install -r requirements.txt`
-8. Create new Python run configuration
+3. Create a new virtual environment at `.venv`
+4. Navigate to root directory
+5. Activate virtual environment with `source .venv/bin/activate`
+6. Install requirements with `pip install -r src/requirements.txt`
+7. Create new Python run configuration
    1. `script` -> `[root]/src/app.py`
-9. Run
+8. Run
+### Validation
+In a browser, hit `http://localhost:5000/healthcheck`.
+If everything is running properly, this should return `Success`
 
 ## Folder Structure
 ```
@@ -60,7 +62,7 @@ This offers a few pre-made functions which should cover most basic database func
 
 #### What to do here
 - Make database queries
-- Handle conversion between `ORM` and `DTO` types
+- Handle conversion from `ORM` to `DTO` types
 #### What not to do here
 - Declare endpoints
 - Interact with other `DAOs`
@@ -110,8 +112,8 @@ There are three types of models:
   - Contains some or all of the same information that a `DTO` has
     - But may omit some fields because they contain sensitive or irrelevant data (ex: birthday)
 
-`ORM` models also come with two methods, `to_dto()` and `from_dto(dto)`.
-These are used by `DAOs` to convert between `DTOs` and `ORMs`.
+`ORM` models also come with a method, `to_dto()`.
+This is used by `DAOs` to convert from `ORMs` to `DTOs`.
 `BaseORM` provides a built-in method for it which maps fields between `DTO` and `ORM` 1:1.
 However, more complex models (ex: models with foreign keys involved) may require override methods.
 

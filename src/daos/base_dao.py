@@ -2,9 +2,11 @@ import logging
 from typing import Any, ClassVar, List, Optional, Type
 
 from sqlalchemy import ColumnElement, delete, insert, select, update
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import Session
 
+from ..exceptions import NotFoundException
 from ..models.base_dto import BaseDTO
 from ..models.base_orm import BaseORM
 from .utils import errorhandle
@@ -17,30 +19,28 @@ class BaseDAO:
 
     @classmethod
     @errorhandle(logger)
-    def insert(cls, session: Session, dto: BaseDTO):
+    def insert(cls, session: Session, orm: BaseORM):
         """
         Insert a record into the database
         :param session: database session
-        :param dto: entity to insert
+        :param orm: entity to insert
         :return: inserted entity
         """
-        orm = cls.__orm_model__.from_dto(dto)
         session.add(orm)
         session.flush()
         return orm.to_dto()
 
     @classmethod
     @errorhandle(logger)
-    def insertmany(cls, session: Session, dtos: List[BaseDTO]):
+    def insertmany(cls, session: Session, orms: List[BaseORM]):
         """
         Insert multiple records into the database
         :param session: database session
-        :param dtos: list of entities to insert
+        :param orms: list of entities to insert
         :return: inserted entities
         """
         stmt = insert(cls.__orm_model__).returning(cls.__orm_model__)
-        orm_models = [cls.__orm_model__.from_dto(dto) for dto in dtos]
-        results = session.scalars(stmt, orm_models)
+        results = session.scalars(stmt, orms)
         session.flush()
         return [result.to_dto() for result in results]
 
@@ -113,7 +113,6 @@ class BaseDAO:
         return result.to_dto() if result else None
 
     @classmethod
-    @errorhandle(logger)
     def delete(cls, session: Session, pkey: Any):
         """
         Delete a record from the database
@@ -129,11 +128,17 @@ class BaseDAO:
             .where(pkey_col == pkey)
             .returning(cls.__orm_model__)
         )
-        result = session.scalars(stmt).one()
-        return result.to_dto()
+        try:
+            result = session.scalars(stmt).one()
+            return result.to_dto()
+        except NoResultFound as e:
+            logger.error(f"No record found with key {pkey}: {e}")
+            raise NotFoundException(f"No record found with key {pkey}: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            raise e
 
     @classmethod
-    @errorhandle(logger)
     def update(cls, session: Session, pkey: Any, **kwargs):
         """
         Updates a record from the database
@@ -151,5 +156,12 @@ class BaseDAO:
             .values(kwargs)
             .returning(cls.__orm_model__)
         )
-        result = session.scalars(stmt).one()
-        return result.to_dto()
+        try:
+            result = session.scalars(stmt).one()
+            return result.to_dto()
+        except NoResultFound as e:
+            logger.error(f"No record found with key {pkey}: {e}")
+            raise NotFoundException(f"No record found with key {pkey}: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+            raise e
