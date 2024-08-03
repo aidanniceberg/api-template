@@ -3,6 +3,9 @@ import logging
 from flask import Flask
 
 from endpoints.v1.v1_app import V1App
+from settings import get_settings
+
+settings = get_settings()
 
 
 class FlaskApp(Flask):
@@ -24,7 +27,10 @@ class FlaskApp(Flask):
 log_fmt = (
     "%(asctime)s - %(levelname)s - [%(name)s:%(funcName)s:%(lineno)3s] %(message)s"
 )
-logging.basicConfig(level=logging.DEBUG, format=log_fmt)
+handler = logging.StreamHandler()
+if settings.is_prod:
+    handler = logging.FileHandler("/var/log/app.log")
+logging.basicConfig(level=logging.DEBUG, format=log_fmt, handlers=[handler])
 
 app = FlaskApp(__name__)
 
