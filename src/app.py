@@ -29,7 +29,7 @@ log_fmt = (
 )
 handler = logging.StreamHandler()
 if settings.is_prod:
-    handler = logging.FileHandler("/var/log/app.log")
+    handler = logging.FileHandler("/var/log/app/app.log")
 logging.basicConfig(level=logging.DEBUG, format=log_fmt, handlers=[handler])
 
 app = FlaskApp(__name__)
