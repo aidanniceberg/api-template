@@ -31,28 +31,7 @@ src
  + services      # business logic goes here
 ```
 
-## Folder Structure Rationale
-Software inevitably changes - features will need to be added, technology requirements will evolve, and business goals will pivot.
-This means that software must be created with flexibility in mind, so new additions can easily be plugged into the existing codebases with minimal changes.
-This allows developers to iterate efficiently and easily.
-With this in mind, the backbone of software design is modularity;
-individual software components (functions, classes, files, folders) should be responsible for one specific functionality, so they can be added, removed, or updated without affecting other areas of the codebase.
-
-Think about this example:
-
->Suppose we have an API with 50 endpoints that query a database and return some data.
-We then write 50 functions, and all of them independently connect to the database.
-It works great, but a week later, we find out we need to change the way we're connecting to the database.
-Now we need to go into all 50 functions and change them individually - this is time-consuming and wasteful.
-Instead, imagine we had an extra class that is _only_ responsible for connecting to the database.
-We use this class in all of our 50 functions.
-At first, everything is the same, but when we're asked to change the way we connect to the database, we only need to make one change rather than 50.
-This is much more efficient.
-
->_side note, this is the DBController class in the `daos` folder_
-
-This is exactly what our folder structure accomplishes, just on a higher level.
-It immediately separates abstract functionality, and within each folder we can (and must) split into more modules.
+## Overview
 The most common flow of information we'll use for endpoints is:
 
 `endpoint layer --> services layer --> database (dao) layer`
@@ -71,7 +50,7 @@ If we need to change the way we're getting data from the database, we only need 
 None of the other modules know or care what's happening, as long as it gets the data that it expects.
 
 
-## Folder Explanations
+## Folders
 ### `clients` folder
 This folder contains all the logic for communicating with third party applications.
 
